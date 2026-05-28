@@ -37,6 +37,7 @@ use uuid::Uuid;
 
 use crate::api::event::Event;
 use crate::api::runtime::EventSubscriberFn;
+use crate::api::subscriber::flush_subscribers;
 use crate::json::Json;
 
 /// The ATIF schema version string embedded in all exported trajectories.
@@ -372,6 +373,11 @@ impl AtifExporter {
     /// Exporting does not clear the buffered events. Call [`AtifExporter::clear`]
     /// when you need to reset the exporter between trajectories.
     pub fn export(&self) -> AtifTrajectory {
+        if let Err(error) = flush_subscribers() {
+            eprintln!(
+                "nemo_relay: failed to flush subscriber dispatcher before ATIF export: {error}"
+            );
+        }
         let (session_id, agent_info, events) = {
             let state = self.state.lock().unwrap();
             (

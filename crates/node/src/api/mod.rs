@@ -2300,10 +2300,20 @@ pub fn register_subscriber(
 
 /// Deregister an event subscriber by name.
 ///
-/// Returns `true` if a subscriber with that name was found and removed.
+/// Future emissions stop seeing the subscriber. Already queued event snapshots may
+/// still run. Returns `true` if a subscriber with that name was found and removed.
 #[napi]
 pub fn deregister_subscriber(name: String) -> Result<bool> {
     core_subscriber_api::deregister_subscriber(&name).map_err(to_napi_err)
+}
+
+/// Wait for native subscriber callbacks queued before this call to finish.
+///
+/// JavaScript subscribers are queued through Node's `ThreadsafeFunction`; callers that
+/// need JS callback side effects should await an event-loop tick after this returns.
+#[napi]
+pub fn flush_subscribers() -> Result<()> {
+    core_subscriber_api::flush_subscribers().map_err(to_napi_err)
 }
 
 // ---------------------------------------------------------------------------

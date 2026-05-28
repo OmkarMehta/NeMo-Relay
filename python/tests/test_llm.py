@@ -164,6 +164,7 @@ class TestLLMGuardrails:
             llm.call_end(handle, {"ok": True})
         finally:
             guardrails.deregister_llm_sanitize_request("py_llm_sanitize_req_fail")
+            subscribers.flush()
             subscribers.deregister("py_llm_sanitize_req_sub")
 
         start = _llm_event(events, "llm_sanitize_req_fail", "start")
@@ -184,6 +185,7 @@ class TestLLMGuardrails:
             llm.call_end(handle, {"ok": True})
         finally:
             guardrails.deregister_llm_sanitize_request("py_llm_sanitize_req_bad")
+            subscribers.flush()
             subscribers.deregister("py_llm_sanitize_req_bad_sub")
 
         start = _llm_event(events, "llm_sanitize_req_bad", "start")
@@ -203,6 +205,7 @@ class TestLLMGuardrails:
             llm.call_end(handle, {"ok": True})
         finally:
             guardrails.deregister_llm_sanitize_response("py_llm_sanitize_resp_fail")
+            subscribers.flush()
             subscribers.deregister("py_llm_sanitize_resp_sub")
 
         end = _llm_event(events, "llm_sanitize_resp_fail", "end")
@@ -221,6 +224,7 @@ class TestLLMGuardrails:
             llm.call_end(handle, {"ok": True})
         finally:
             guardrails.deregister_llm_sanitize_response("py_llm_sanitize_resp_bad")
+            subscribers.flush()
             subscribers.deregister("py_llm_sanitize_resp_bad_sub")
 
         end = _llm_event(events, "llm_sanitize_resp_bad", "end")
@@ -670,6 +674,7 @@ class TestLLMStreaming:
             handle = llm.call("llm_subscriber_error", make_request())
             llm.call_end(handle, {"ok": True})
         finally:
+            subscribers.flush()
             subscribers.deregister("py_llm_bad_sub")
             subscribers.deregister("py_llm_good_sub")
 

@@ -853,9 +853,10 @@ impl AtifDispatcher {
         let callback = atif_scope_subscriber(state, agent_uuid, storage);
         // Attach the scoped subscriber to the trajectory root rather than the
         // global registry so sibling top-level trajectories never share events.
-        if let Err(err) = scope_register_subscriber(&agent_uuid, &name, callback) {
-            self.fatal_error = Some(format!("failed to register ATIF scope subscriber: {err}"));
-        } else {
+        // With async subscriber delivery, the root scope may already be closed
+        // when the dispatcher observes this start event; global routing still
+        // handles descendant events by parent UUID in that case.
+        if scope_register_subscriber(&agent_uuid, &name, callback).is_ok() {
             self.scope_subscribers.insert(agent_uuid, name);
         }
         None
